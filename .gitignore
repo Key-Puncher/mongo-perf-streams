@@ -6,3 +6,4 @@ tags
 benchrun_daemon.conf
 
 node_modules
+.vscode/*

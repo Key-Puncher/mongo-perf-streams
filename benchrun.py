@@ -220,7 +220,6 @@ def main():
               ");")
 
     commands = '\n'.join(commands)
-    print(commands)
 
     with NamedTemporaryFile('w', suffix='.js') as js_file:
         js_file.write(commands)
@@ -239,7 +238,7 @@ def main():
         for line in iter(mongo_proc.stdout.readline, ''):
             line = line.strip()
             if line == "@@@START@@@":
-                readout = True
+                readout = False #True
                 getting_results = False
             elif line == "@@@END@@@":
                 readout = False
@@ -251,7 +250,14 @@ def main():
                 readout = False
                 got_results = True
                 getting_results = False
+            elif "@START_TEST_PRINT@" in line:
+                readout = True
+                #print(line)
+            elif "@END_TEST_PRINT@" in line:
+                readout = False
+                #print(line)
             elif readout:
+                #pass
                 print(line)
             elif not got_results and getting_results:
                 line_results += line

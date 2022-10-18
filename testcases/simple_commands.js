@@ -1,4 +1,4 @@
-if (typeof(tests) != "object") {
+if (typeof (tests) != "object") {
     tests = [];
 }
 
@@ -9,7 +9,7 @@ if (typeof(tests) != "object") {
 tests.push({
     name: "Commands.isMaster",
     tags: ['command'],
-    ops: [{op: "command", ns: "#B_DB", command: {"isMaster": 1}}]
+    ops: [{ op: "command", ns: "#B_DB", command: { "isMaster": 1 } }]
 });
 
 /*
@@ -19,7 +19,7 @@ tests.push({
 tests.push({
     name: "Commands.buildInfo",
     tags: [],
-    ops: [{op: "command", ns: "#B_DB", command: {"buildInfo": 1}}]
+    ops: [{ op: "command", ns: "#B_DB", command: { "buildInfo": 1 } }]
 });
 
 /*
@@ -29,14 +29,14 @@ tests.push({
 tests.push({
     name: "Commands.illegalOp",
     tags: [],
-    ops: [{op: "command", ns: "#B_DB", command: {"notExist": 1}}]
+    ops: [{ op: "command", ns: "#B_DB", command: { "notExist": 1 } }]
 });
 
 /*
  * Setup:
  * Test: Run benchrun command nop. Doesn't touch the server.
  */
-tests.push({name: "Commands.nop", tags: [], ops: [{op: "nop"}]});
+tests.push({ name: "Commands.nop", tags: [], ops: [{ op: "nop" }] });
 
 /*
  * Setup: Create collection of documents with only integer _id field
@@ -45,15 +45,15 @@ tests.push({name: "Commands.nop", tags: [], ops: [{op: "nop"}]});
 tests.push({
     name: "Commands.CountsFullCollection",
     tags: ['command', 'regression'],
-    pre: function(collection) {
+    pre: function (collection) {
         collection.drop();
         var docs = [];
         for (var i = 0; i < 4800; i++) {
-            docs.push({_id: i});
+            docs.push({ _id: i });
         }
         collection.insert(docs);
     },
-    ops: [{op: "command", ns: "#B_DB", command: {"count": "#B_COLL"}}]
+    ops: [{ op: "command", ns: "#B_DB", command: { "count": "#B_COLL" } }]
 });
 
 /*
@@ -63,18 +63,18 @@ tests.push({
 tests.push({
     name: "Commands.CountsIntIDRange",
     tags: ['command', 'regression'],
-    pre: function(collection) {
+    pre: function (collection) {
         collection.drop();
         var docs = [];
         for (var i = 0; i < 4800; i++) {
-            docs.push({_id: i});
+            docs.push({ _id: i });
         }
         collection.insert(docs);
     },
     ops: [{
         op: "command",
         ns: "#B_DB",
-        command: {count: "#B_COLL", query: {_id: {"$gt": 10, "$lt": 100}}}
+        command: { count: "#B_COLL", query: { _id: { "$gt": 10, "$lt": 100 } } }
     }]
 });
 
@@ -87,20 +87,20 @@ tests.push({
 tests.push({
     name: "Commands.FindAndModifyInserts",
     tags: ['command', 'regression'],
-    pre: function(collection) {
+    pre: function (collection) {
         collection.drop();
     },
     ops: [
-        {op: "let", target: "x", value: {"#RAND_INT_PLUS_THREAD": [0, 100]}},
+        { op: "let", target: "x", value: { "#RAND_INT_PLUS_THREAD": [0, 100] } },
         {
-          op: "command",
-          ns: "#B_DB",
-          command: {
-              findAndModify: "#B_COLL",
-              upsert: true,
-              query: {_id: {"#VARIABLE": "x"}},
-              update: {_id: {"#VARIABLE": "x"}}
-          }
+            op: "command",
+            ns: "#B_DB",
+            command: {
+                findAndModify: "#B_COLL",
+                upsert: true,
+                query: { _id: { "#VARIABLE": "x" } },
+                update: { _id: { "#VARIABLE": "x" } }
+            }
         }
     ]
 });
@@ -118,7 +118,7 @@ tests.push({
         var nDocs = 5000;
         var bulk = collection.initializeUnorderedBulkOp();
         for (var i = 0; i < nDocs; i++) {
-            bulk.insert({count: 0, rand: Random.rand()});
+            bulk.insert({ count: 0, rand: Random.rand() });
         }
         bulk.execute();
     },
@@ -128,8 +128,8 @@ tests.push({
         command: {
             findAndModify: "#B_COLL",
             query: {},
-            update: {$inc: {count: 1}},
-            sort: {count: 1, rand: 1}
+            update: { $inc: { count: 1 } },
+            sort: { count: 1, rand: 1 }
         }
     }]
 });
@@ -148,17 +148,17 @@ tests.push({
         var nDocs = 5000;
         var bulk = collection.initializeUnorderedBulkOp();
         for (var i = 0; i < nDocs; i++) {
-            bulk.insert({ts: new Date()});
+            bulk.insert({ ts: new Date() });
         }
         bulk.execute();
     },
     ops: [
         {
-          op: "command",
-          ns: "#B_DB",
-          command: {findAndModify: "#B_COLL", query: {}, remove: true, sort: {ts: 1}}
+            op: "command",
+            ns: "#B_DB",
+            command: { findAndModify: "#B_COLL", query: {}, remove: true, sort: { ts: 1 } }
         },
-        {op: "insert", doc: {ts: {"#CUR_DATE": 0}}}
+        { op: "insert", doc: { ts: { "#CUR_DATE": 0 } } }
     ]
 });
 
@@ -176,10 +176,10 @@ tests.push({
         var nDocs = 5000;
         var bulk = collection.initializeUnorderedBulkOp();
         for (var i = 0; i < nDocs; i++) {
-            bulk.insert({count: 0, rand: Random.rand()});
+            bulk.insert({ count: 0, rand: Random.rand() });
         }
         bulk.execute();
-        collection.createIndex({count: 1, rand: 1});
+        collection.createIndex({ count: 1, rand: 1 });
     },
     ops: [{
         op: "command",
@@ -187,8 +187,8 @@ tests.push({
         command: {
             findAndModify: "#B_COLL",
             query: {},
-            update: {$inc: {count: 1}},
-            sort: {count: 1, rand: 1}
+            update: { $inc: { count: 1 } },
+            sort: { count: 1, rand: 1 }
         }
     }]
 });
@@ -208,18 +208,18 @@ tests.push({
         var nDocs = 5000;
         var bulk = collection.initializeUnorderedBulkOp();
         for (var i = 0; i < nDocs; i++) {
-            bulk.insert({ts: new Date()});
+            bulk.insert({ ts: new Date() });
         }
         bulk.execute();
-        collection.createIndex({ts: 1});
+        collection.createIndex({ ts: 1 });
     },
     ops: [
         {
-          op: "command",
-          ns: "#B_DB",
-          command: {findAndModify: "#B_COLL", query: {}, remove: true, sort: {ts: 1}}
+            op: "command",
+            ns: "#B_DB",
+            command: { findAndModify: "#B_COLL", query: {}, remove: true, sort: { ts: 1 } }
         },
-        {op: "insert", doc: {ts: {"#CUR_DATE": 0}}}
+        { op: "insert", doc: { ts: { "#CUR_DATE": 0 } } }
     ]
 });
 
@@ -232,35 +232,35 @@ tests.push({
  * The function creates a full test, with name, tags, ops, and pre fields
  */
 function genDistinctTest(name, index, query) {
-    var doc = {name: name, tags: ['distinct', 'command', 'core']};
+    var doc = { name: name, tags: ['distinct', 'command', 'core'] };
     if (index) {
-        doc.pre = function(collection) {
+        doc.pre = function (collection) {
             collection.drop();
             var docs = [];
             for (var i = 0; i < 4800; i++) {
-                docs.push({x: 1});
-                docs.push({x: 2});
-                docs.push({x: 3});
+                docs.push({ x: 1 });
+                docs.push({ x: 2 });
+                docs.push({ x: 3 });
             }
             collection.insert(docs);
-            collection.createIndex({x: 1});
+            collection.createIndex({ x: 1 });
         };
     } else {
-        doc.pre = function(collection) {
+        doc.pre = function (collection) {
             collection.drop();
             var docs = [];
             for (var i = 0; i < 4800; i++) {
-                docs.push({x: 1});
-                docs.push({x: 2});
-                docs.push({x: 3});
+                docs.push({ x: 1 });
+                docs.push({ x: 2 });
+                docs.push({ x: 3 });
             }
             collection.insert(docs);
         };
     }
 
-    var op = {op: "command", ns: "#B_DB", command: {distinct: "#B_COLL", key: "x"}};
+    var op = { op: "command", ns: "#B_DB", command: { distinct: "#B_COLL", key: "x" } };
     if (query)
-        op.command.query = {x: 1};
+        op.command.query = { x: 1 };
 
     doc.ops = [op];
 
