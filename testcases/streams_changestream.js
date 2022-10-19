@@ -6,7 +6,7 @@ if (typeof (tests) != "object") {
 
 // Create a document
 
-sizes = [100, 10000, 100000, 1000000, 10000000]
+sizes = [100, 10000, 100000, 1000000]
 
 
 // TEST change streams source
@@ -16,8 +16,8 @@ sizes.forEach(size => {
     doc = { "fieldName": 'x'.repeat(size) }
 
     tests.push({
-        name: "ChangeStreams".concat(size.toString()),
-        tags: ['insert', 'regression'],
+        name: "ChangeStreams-".concat(size.toString()),
+        tags: ['streams'],
         pre: function (collection) {
 
             let agg = []

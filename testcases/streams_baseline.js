@@ -4,15 +4,16 @@ if (typeof (tests) != "object") {
     tests = [];
 }
 
-sizes = [100, 10000, 100000, 1000000, 10000000]
+sizes = [100, 10000, 100000, 1000000]
 
 sizes.forEach(size => {
     // Create the documents
     doc = { "fieldName": 'x'.repeat(size) }
 
     tests.push({
-        name: "Insert.Baseline",
-        tags: ['insert', 'regression'],
+        // Naming convention is {TEST_NAME}-{BYTES}
+        name: "Baseline-".concat(size.toString()),
+        tags: ['streams'],
         pre: function (collection) { collection.drop(); },
         ops: [
             {
