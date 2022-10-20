@@ -6,7 +6,7 @@ if (typeof (tests) != "object") {
 
 
 // batchSize = 100;
-// // byte string size in the document 
+// // byte string size in the document
 // var docSize = 100;
 // function makeDocument(docSize) {
 //     var doc = { "fieldName": "" };
@@ -18,7 +18,7 @@ if (typeof (tests) != "object") {
 // doc = makeDocument(docSize);
 
 
-sizes = [100, 10000, 100000, 1000000, 10000000]
+sizes = [100, 5000, 10000, 50000]
 
 // test manual insertion source
 
@@ -27,8 +27,9 @@ sizes.forEach(size => {
     doc = { "fieldName": 'x'.repeat(size) }
 
     tests.push({
+        // Naming convention is {TEST_NAME}-{BYTES}
         name: "ManualInsertion".concat(size.toString()),
-        tags: ['insert', 'regression'],
+        tags: ["streams", "manual-insert"],
         pre: function (collection) {
             //collection.getDB()["ManualInsertion0"].drop()
             //collection.getDB()["output0"].drop()
@@ -42,7 +43,6 @@ sizes.forEach(size => {
             })
 
             collection.getDB().createStream("ManualInsertion".concat(size.toString()), agg)
-            // print(Object.bsonsize(doc))
         },
         ops: [
             {
