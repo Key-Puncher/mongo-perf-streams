@@ -6,13 +6,16 @@ if (typeof (tests) != "object") {
 
 sizes = [100, 5000, 10000, 50000]
 
+const command = `${TOTAL_THREADS}> output-data-baseline.csv`
+run("bash", "-c", command);
+
 sizes.forEach(size => {
     // Create the documents
     doc = { "fieldName": 'x'.repeat(size) }
 
     tests.push({
-        // Naming convention is {TEST_NAME}-{BYTES}
-        name: "Baseline-".concat(size.toString()),
+        // Naming convention is {TEST_NAME}{BYTES}
+        name: "Baseline".concat(size.toString()),
         tags: ['streams'],
         pre: function (collection) { collection.drop(); },
         ops: [
@@ -21,9 +24,13 @@ sizes.forEach(size => {
                 doc: doc
             }
         ],
-        post: function (collection) {
+        post: function (collection, env) {
             print("@START_TEST_PRINT@")
-            print("Count of total into baseline: ", collection.count())
+            let name = "Baseline".concat(size.toString())
+            let totalCount = collection.count()
+            const data = `${name},${env.threads},${totalCount}`
+            const command = `echo ${data} >> output-data-baseline.csv`
+            run("bash", "-c", command);
             print("@END_TEST_PRINT@")
         }
     })

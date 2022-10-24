@@ -7,6 +7,8 @@ import sys
 import json
 import urllib.request, urllib.error, urllib.parse
 import os
+import csv
+import glob
 
 
 
@@ -264,6 +266,50 @@ def main():
 
     print("Finished Testing.")
     results_parsed = json.loads(line_results)
+    # csv files in the path
+    files = glob.glob("./output-data*.csv")
+    collection_count = {}
+
+    for filename in files:
+        with open(filename) as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for row in reader:
+                test_name = row[0]
+                thread = row[1]
+                output_collection_count = int(row[2])
+                if test_name not in collection_count:
+                    collection_count[test_name] = {}
+
+                if thread not in collection_count[test_name]:
+                    collection_count[test_name][thread] = []
+                collection_count[test_name][thread].append(output_collection_count)
+
+    csv_summary = "test,threads,ops_per_sec,output_per_sec,output_count,error_count\n"
+
+    for result in results_parsed["results"]:
+        test_name = result["name"]
+        if test_name in collection_count:
+            for thread_number, thread_result in result["results"].items():
+                if isinstance(thread_result, dict):
+                    result["results"][thread_number]["output_count"] = collection_count[test_name][thread_number]
+                    result["results"][thread_number]["output_per_sec_values"] = [x / args.seconds for x in collection_count[test_name][thread_number]]
+
+
+                    len_output = len(result["results"][thread_number]["output_per_sec_values"])
+                    len_ops = len(result["results"][thread_number]["ops_per_sec_values"])
+                    print("test", len_output, len_ops)
+                    assert len_output == len_ops, "Output values do not match ops per seconds"
+
+                    for index, value in enumerate(result["results"][thread_number]["ops_per_sec_values"]):
+                        output_per_sec = result["results"][thread_number]["output_per_sec_values"][index]
+                        output_count = result["results"][thread_number]["output_count"][index]
+                        error_value = result["results"][thread_number]["error_values"][index]
+                        csv_summary += f"{test_name},{thread_number},{value},{output_per_sec},{output_count},{error_value}\n"
+
+    text_file = open("csv_summary.txt", "w")
+    text_file.write(csv_summary)
+    text_file.close()
+
     if args.outfile:
         out = open(args.outfile, 'w')
         json.dump(results_parsed, out, indent=4, separators=(',', ': '))

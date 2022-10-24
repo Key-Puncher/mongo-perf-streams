@@ -10,14 +10,17 @@ sizes = [100, 5000, 10000, 50000]
 
 
 // TEST change streams source
+// Clear existing file
+const command = `> output-data-change-streams.csv`
+run("bash", "-c", command);
 
 sizes.forEach(size => {
     // Create the documents
     doc = { "fieldName": 'x'.repeat(size) }
 
     tests.push({
-        // Naming convention is {TEST_NAME}-{BYTES}
-        name: "ChangeStreams-".concat(size.toString()),
+        // Naming convention is {TEST_NAME}{BYTES}
+        name: "ChangeStreams".concat(size.toString()),
         tags: ["streams", "change-stream"],
         pre: function (collection) {
 
@@ -40,9 +43,15 @@ sizes.forEach(size => {
                 doc: doc
             },
         ],
-        post: function (collection) {
+        post: function (collection, env) {
             print("@START_TEST_PRINT@")
-            print("Count of total into change streams: ", collection.getDB()["output0"].count())
+            let streamName = "ChangeStreams".concat(size.toString())
+            let totalCount = collection.getDB()["output0"].count()
+
+            const data = `${streamName},${env.threads},${totalCount}`
+            const command = `echo ${data} >> output-data-change-streams.csv`
+            run("bash", "-c", command);
+
             print("@END_TEST_PRINT@")
             collection.getDB()["ChangeStream".concat(size.toString())].drop()
             collection.getDB()["output0"].drop()
