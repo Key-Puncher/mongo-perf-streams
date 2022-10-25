@@ -303,7 +303,6 @@ def main():
 
                         len_output = len(result["results"][thread_number]["output_per_sec_values"])
                         len_ops = len(result["results"][thread_number]["ops_per_sec_values"])
-                        print("test", len_output, len_ops)
                         assert len_output == len_ops, "Output values do not match ops per seconds"
 
                         for index, value in enumerate(result["results"][thread_number]["ops_per_sec_values"]):
