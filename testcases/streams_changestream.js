@@ -11,8 +11,7 @@ sizes = [100, 5000, 10000, 50000]
 
 // TEST change streams source
 // Clear existing file
-const command = `> output-data-change-streams.csv`
-run("bash", "-c", command);
+run("bash", "-c", `> output-data-change-streams.csv`);
 
 sizes.forEach(size => {
     // Create the documents
