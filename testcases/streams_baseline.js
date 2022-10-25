@@ -6,7 +6,7 @@ if (typeof (tests) != "object") {
 
 sizes = [100, 5000, 10000, 50000]
 
-const command = `${TOTAL_THREADS}> output-data-baseline.csv`
+const command = `> output-data-baseline.csv`
 run("bash", "-c", command);
 
 sizes.forEach(size => {
