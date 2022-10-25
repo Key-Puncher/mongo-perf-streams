@@ -22,8 +22,7 @@ if (typeof (tests) != "object") {
 sizes = [100, 10000, 1000000, 10000000]
 
 // Clear existing file
-const command = `> output-data-manual-insertion.csv`
-run("bash", "-c", command);
+run("bash", "-c", `> output-data-manual-insertion.csv`);
 
 sizes.forEach(size => {
     // Create the documents
@@ -41,7 +40,7 @@ sizes.forEach(size => {
             let agg = []
 
             agg.push({
-                $merge: { into: { db: "test0", coll: `${streamName}-output`} }
+                $merge: { into: { db: "test0", coll: `${streamName}-output` } }
             })
 
             collection.getDB().createStream(streamName, agg)

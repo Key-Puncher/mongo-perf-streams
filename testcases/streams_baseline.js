@@ -6,8 +6,7 @@ if (typeof (tests) != "object") {
 
 sizes = [100, 5000, 10000, 50000]
 
-const command = `> output-data-baseline.csv`
-run("bash", "-c", command);
+run("bash", "-c", `> output-data-baseline.csv`);
 
 sizes.forEach(size => {
     // Create the documents
@@ -26,11 +25,14 @@ sizes.forEach(size => {
         ],
         post: function (collection, env) {
             print("@START_TEST_PRINT@")
+
             let name = "Baseline".concat(size.toString())
             let totalCount = collection.count()
+
             const data = `${name},${env.threads},${totalCount}`
             const command = `echo ${data} >> output-data-baseline.csv`
-            run("bash", "-c", command);
+            run("bash", "-c", command)
+
             print("@END_TEST_PRINT@")
         }
     })
