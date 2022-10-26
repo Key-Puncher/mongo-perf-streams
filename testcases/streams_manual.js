@@ -5,7 +5,7 @@ if (typeof (tests) != "object") {
 }
 
 // sizes = [100]
-sizes = [100, 10000, 1000000]//, 10000000]
+sizes = [100, 10000, 100000, 1000000]
 
 // Clear existing file
 run("bash", "-c", `> output-data-manual-insertion.csv`);

@@ -6,7 +6,7 @@ if (typeof (tests) != "object") {
 
 // Create a document
 
-sizes = [100, 5000, 10000, 50000]
+sizes = [100, 10000, 100000, 1000000]
 
 
 // TEST change streams source
