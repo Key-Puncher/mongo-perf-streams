@@ -4,20 +4,6 @@ if (typeof (tests) != "object") {
     tests = [];
 }
 
-
-// batchSize = 100;
-// // byte string size in the document
-// var docSize = 100;
-// function makeDocument(docSize) {
-//     var doc = { "fieldName": "" };
-//     while (Object.bsonsize(doc) < docSize) {
-//         doc.fieldName += "x";
-//     }
-//     return doc;
-// }
-// doc = makeDocument(docSize);
-
-
 // sizes = [100]
 sizes = [100, 10000, 1000000]//, 10000000]
 
