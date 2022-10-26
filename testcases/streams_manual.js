@@ -19,7 +19,7 @@ if (typeof (tests) != "object") {
 
 
 // sizes = [100]
-sizes = [100, 10000, 1000000, 10000000]
+sizes = [100, 10000, 1000000]//, 10000000]
 
 // Clear existing file
 run("bash", "-c", `> output-data-manual-insertion.csv`);
@@ -74,126 +74,107 @@ sizes.forEach(size => {
 
 // TEST empty $match pipeline
 
-// sizes.forEach(size => {
-//     // Create the documents
-//     doc = { "fieldName": 'x'.repeat(size) }
+sizes.forEach(size => {
+    // Create the documents
+    doc = { "fieldName": 'x'.repeat(size) }
 
-//     tests.push({
-//         name: "ManualInsertion".concat(size.toString()),
-//         tags: ['insert', 'regression'],
-//         pre: function (collection) {
-//             let agg = []
+    tests.push({
+        name: "ManualInsertion.EmptyMatch".concat(size.toString()),
+        tags: ["streams", "manual-insert"],
+        pre: function (collection) {
+            let agg = []
 
-//             agg.push({
-//                 $match: { fieldName: "Nothin" }
-//             })
+            agg.push({
+                $match: { fieldName: "Nothin" }
+            })
 
-//             // agg.push({
-//             //     $merge: { into: { db: "test0", coll: "output0" } }
-//             // })
+            collection.getDB().createStream("ManualInsertion.EmptyMatch".concat(size.toString()), agg)
+        },
+        ops: [
+            {
+                op: "insert",
+                ns: "test0.ManualInsertion.EmptyMatch".concat(size.toString()),
+                doc: doc
+            }
+        ],
+        post: function (collection, env) {
+            print("@START_TEST_PRINT@")
+            let streamName = "ManualInsertion.EmptyMatch".concat(size.toString())
+            let totalCount = collection.getDB()[`${streamName}-output`].count()
 
-//             collection.getDB().createStream("ManualInsertion".concat(size.toString()), agg)
-//         },
-//         ops: [
-//             {
-//                 op: "insert",
-//                 ns: "test0.ManualInsertion".concat(size.toString()),
-//                 doc: doc
-//             }
-//         ],
-//         post: function (collection) {
-//             print("@START_TEST_PRINT@")
-//             print("Count of total into manual insertion: ", collection.getDB()["output0"].count())
-//             //printjson(collection.getDB()["output0"].findOne())
-//             print("@END_TEST_PRINT@")
-//             collection.getDB()["ManualInsertion".concat(size.toString())].drop()
-//             collection.getDB()["output0"].drop()
-//             sleep(5000)
-//             // collection.drop()
-//         }
-//     })
-// });
+            const dropStream = collection.getDB()[streamName].drop()
+            print(`Drop stream status`, dropStream)
+
+            const dropCollection = collection.getDB()[`${streamName}-output`].drop()
+            print(`Drop collection status`, dropCollection)
+
+            const data = `${streamName},${env.threads},${totalCount}`
+            const command = `echo ${data} >> output-data-manual-insertion.csv`
+            run("bash", "-c", command);
+            print("@END_TEST_PRINT@")
+        }
+    })
+});
 
 
 // TEST window count
 // TEST manual insertion source
 
-// sizes.forEach((size) => {
-//     // Create the documents
-//     doc = { "fieldName": 'x'.repeat(size) }
+sizes.forEach((size) => {
+    // Create the documents
+    doc = { "fieldName": 'x'.repeat(size) }
 
-//     tests.push({
-//         name: `ManualInsertion${size}`,
-//         tags: ['insert', 'regression'],
-//         pre: function (collection) {
-//             let agg = []
+    tests.push({
+        name: "ManualInsertion.Window".concat(size.toString()),
+        tags: ['manual-insert', 'streams', 'windows'],
+        pre: function (collection) {
+            let streamName = "ManualInsertion.Window".concat(size.toString());
 
-//             print("@START_TEST_PRINT@")
+            //collection.getDB()[`${streamName}-output`].drop()
 
-//             let streamName = collection.getName()
+            let agg = []
 
-//             const dropRes1 = collection.getDB()[streamName].drop()
+            agg.push({ $window: { type: 'tumbling', size: 5, unit: 'second' } })
 
-//             print("collection.getDB()", collection.getDB(), `${streamName}-output`)
-//             const dropRes2 = collection.getDB()[`${streamName}-output`].drop()
+            agg.push({
+                $groups: { _id: null, count: { $sum: 1 } }
+            })
 
-//             print(`Count of total into manual insertion ${streamName}: `, collection.getDB()[`${streamName}-output`].count())
+            agg.push({
+                $set: { _id: "$count" }
+            })
 
-//             print("PRE dropRes1", dropRes1)
-//             print("PRE dropRes2", dropRes2)
-//             sleep(5000)
+            agg.push({
+                $merge: { into: { db: "test0", coll: `${streamName}-output` } }
+            })
 
-//             // let agg = []
+            collection.getDB().createStream(streamName, agg)
+        },
+        ops: [
+            {
+                op: "insert",
+                ns: "test0.ManualInsertion.Window".concat(size.toString()),
+                doc: doc
+            }
+        ],
+        post: function (collection, env) {
+            print("@START_TEST_PRINT@")
+            let streamName = "ManualInsertion.Window".concat(size.toString());
 
-//             // agg.push({
-//             //     $merge: { into: { db: "test0", coll: `${streamName}-output`} }
-//             // })
+            printjson(collection.getDB()[`${streamName}-output`].findOne())
 
-//             // agg.push({ $window: { type: 'tumbling', size: 5, unit: 'second' } })
+            let totalCount = collection.getDB()[`${streamName}-output`].count()
 
-//             // agg.push({
-//             //     $groups: { _id: null, count: { $sum: 1 } }
-//             // })
+            const dropStream = collection.getDB()[streamName].drop()
+            print(`Drop stream status`, dropStream)
 
-//             // agg.push({
-//             //     $set: { _id: "$count" }
-//             // })
+            const dropCollection = collection.getDB()[`${streamName}-output`].drop()
+            print(`Drop collection status`, dropCollection)
 
-//             agg.push({
-//                 $merge: { into: { db: "test0", coll: `${streamName}-output` } }
-//             })
-
-//             const createStreamRes = collection.getDB().createStream(streamName, agg)
-
-//             printjson(createStreamRes)
-//             print("@END_TEST_PRINT@")
-//         },
-//         ops: [
-//             {
-//                 op: "insert",
-//                 ns: "test0.ManualInsertion".concat(size.toString()),
-//                 doc: doc
-//             }
-//         ],
-//         post: function (collection) {
-//             print("@START_TEST_PRINT@")
-//             // let streamName = `ManualInsertion-${size}`
-//             let streamName = collection.getName()
-//             print("collection.getDB()", collection.getDB())
-
-//             print(`Count of total into manual insertion ${streamName}: `, collection.getDB()[`${streamName}-output`].count())
-//             printjson(collection.getDB()[`${streamName}-output`].findOne())
-
-//             const dropRes1 = collection.getDB()[streamName].drop()
-//             const dropRes2 = collection.getDB()[`${streamName}-output`].drop()
-
-//             print("POST dropRes1", dropRes1)
-//             print("POST dropRes2", dropRes2)
-
-//             print(">>>>>>>>>>>>>>>>")
-//             print("@END_TEST_PRINT@")
-//             sleep(5000)
-//             // collection.drop()
-//         }
-//     })
-// });
+            const data = `${streamName},${env.threads},${totalCount}`
+            const command = `echo ${data} >> output-data-manual-insertion.csv`
+            run("bash", "-c", command);
+            print("@END_TEST_PRINT@")
+        }
+    })
+});

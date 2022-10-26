@@ -310,7 +310,7 @@ def main():
                             output_count = result["results"][thread_number]["output_count"][index]
                             error_value = result["results"][thread_number]["error_values"][index]
                             csv_body += f"{test_name},{thread_number},{value},{output_per_sec},{output_count},{error_value}\n"
-
+                            
         text_file = open(args.csv_summary, "w")
         text_file.write(csv_body)
         text_file.close()
