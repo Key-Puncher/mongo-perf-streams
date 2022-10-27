@@ -1,59 +1,30 @@
-# MONGO-PERF:
+# MONGO-PERF-STREAMS:
 
-Mongo-perf (not to be confused with mongoperf) is a micro benchmarking tool for the MongoDB server. It measures throughput of commands with regards to the number of threads.
+This project uses the existing mongo-perf framework to benchmark the streaming implementation of MongoDB Labs. It modifies the tests and inputs to insert into a stream instead of a MongoDB collection.
 
-### OVERVIEW:
-This repo contains scripts to run benchmark tests for MongoDB.
+The tests that are relevant to streaming have the `"streams"` tag, and 
 
 ### DEPENDENCIES:
-*General Benchmarking Dependencies*  
-* Python >= 3.0  
-* mongo shell >= 2.7.7-pre- (at revision 881b3a97fb5080b4e5d5ce11ad016da73ea23931 or newer)  
+Running these performance tests requires a custom mongod to be used from streaming branch of [https://github.com/mongodb-labs/mongo/tree/streaming]mongodb-labs/mongo, and the streaming branch from [https://github.com/mongodb-labs/labs-modules/tree/streaming]labs-modules.
 
-*Installing Python Dependencies*
-`pip install -r requirements.txt`
+To see details on how to build the server, see the documentation in [https://github.com/mongodb-labs/mongo/tree/streaming]mongodb-labs/mongo.
 
-*Python Benchmarking Dependencies*  
-* argparse  
+### RUNNING THE TESTS:
 
-*Python Reporting Dependencies*  
-* bottle  
-* pymongo  
+First, activate the virtual environment then start up the mongod server from mongodb-labs/mongo
 
-### HOW TO RUN:
-*To run a micro benchmarking test or tests:*  
-`python benchrun.py -f <list of testfiles> -t <list of thread configs> [-m <number of dbs>] [-s <shell path>]`  
+`./build/opt/install/bin/mongod --port 27017 --dbpath /data/db --replSet rs0 --logpath /data/log/mongod.log --bind_ip localhost --fork`
 
-For example, to run the `simple_insert.js` test case on 1, 2, and 4 threads, no multi-db and using the basic mongo shell:  
-`python benchrun.py -f testcases/simple_insert.js  -t 1 2 4`
+Then specify the directory containing the custom mongo shell location.
+`python benchrun.py -f <list of testfiles> -t <list of thread configs> -s <shell path> [--trialTime <seconds>] [--trialCount <number of trials] [--summary <output file name>]`
 
-To run the single test case 'Queries.Empty` on 1, 2, and 4 thread:
-`python benchrun.py -f testcases/* --includeFilter Queries.Empty -t 1 2 4`
+For example, to run all streaming tests with 1 thread, 5 trials each test and 5 seconds for each trial, outputting all results into a summary csv:
+`python benchrun.py -f testcases/* -t 1 -s ~/mongo/build/opt/install/bin/mongo --includeFilter streams --trialTime 5 --trialCount 5 --summary summary.csv`
 
-
-To run all insert and update test cases on 1, 2, and 4 threads, for 10
-seconds each using the basic mongo shell:  
-`python benchrun.py -f testcases/* -t 1 2 4 --includeFilter insert update --trialTime 10`
-
-To run all insert and update test cases that are also have the tag
-core on 1, 2, and 4 threads, for 10
-seconds each using the basic mongo shell:  
-`python benchrun.py -f testcases/* -t 1 2 4 --includeFilter insert update --includeFilter core --trialTime 10`
+To run only manual insertion tests with 1, and 10 threads:
+`python benchrun.py -f testcases/streams_manual.js -t 1 10 -s ~/mongo/build/opt/install/bin/mongo --trialTime 5 --trialCount 5`
 
 For a complete list of options :  
 `python benchrun.py --help`
 
-### RESULT CHANGES
-
-Mongo-perf is built upon the Mongo shell benchrun command. The results
-format of benchrun changed in Mongo 3.1.5 and 3.0.5. Because of the
-result changes, mongo-perf results from before 3.1.5 or 3.0.5 may not
-be directly comparable to results after 3.1.5 or 3.0.5.
-
-As of Mongo 3.1.5 and 3.0.5 the benchrun command measures op performance on the client side,
-instead of on the server side. Any and only those ops passed into the op array of the benchrun
-command are counted as ops for the purpose of reporting throughput. In some cases this may cause
-the reported throughput to be higher than previous version of mongo-perf (for instance, if the
-"let" operation is used), or lower than before (for instance, if the shell issues getMore commands
-in addition to a query in order to complete an op).
-
+For further information, see the full mongo-perf documentation at [https://github.com/mongodb/mongo-perf]mongodb/mongo-perf.
