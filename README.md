@@ -5,9 +5,9 @@ This project uses the existing mongo-perf framework to benchmark the streaming i
 The tests that are relevant to streaming have the `"streams"` tag, and 
 
 ### DEPENDENCIES:
-Running these performance tests requires a custom mongod to be used from streaming branch of [https://github.com/mongodb-labs/mongo/tree/streaming]mongodb-labs/mongo, and the streaming branch from [https://github.com/mongodb-labs/labs-modules/tree/streaming]labs-modules.
+Running these performance tests requires a custom mongod to be used from streaming branch of [mongodb-labs/mongo](https://github.com/mongodb-labs/mongo/tree/streaming), and the streaming branch from [labs-modules](https://github.com/mongodb-labs/labs-modules/tree/streaming).
 
-To see details on how to build the server, see the documentation in [https://github.com/mongodb-labs/mongo/tree/streaming]mongodb-labs/mongo.
+To see details on how to build the server, see the documentation in [mongodb-labs/mongo](https://github.com/mongodb-labs/mongo/tree/streaming).
 
 ### RUNNING THE TESTS:
 
@@ -27,4 +27,4 @@ To run only manual insertion tests with 1, and 10 threads:
 For a complete list of options :  
 `python benchrun.py --help`
 
-For further information, see the full mongo-perf documentation at [https://github.com/mongodb/mongo-perf]mongodb/mongo-perf.
+For further information, see the full mongo-perf documentation at [mongodb/mongo-perf](https://github.com/mongodb/mongo-perf).
