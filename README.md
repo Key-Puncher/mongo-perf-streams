@@ -16,18 +16,23 @@ First, activate the virtual environment then start up the mongod server from mon
 `./build/opt/install/bin/mongod --port 27017 --dbpath /data/db --replSet rs0 --logpath /data/log/mongod.log --bind_ip localhost --fork`
 
 Once the server is running, connect to mongo and setup the replica set with
+
 `rs.initiate()`
 
 Then specify the directory containing the custom mongo shell location and run benchrun.py.
+
 `python benchrun.py -f <list of testfiles> -t <list of thread configs> -s <shell path> [--trialTime <seconds>] [--trialCount <number of trials] [--summary <output file name>]`
 
 For example, to run all streaming tests with 1 thread, 5 trials each test and 5 seconds for each trial, outputting all results into a summary csv:
+
 `python benchrun.py -f testcases/* -t 1 -s ~/mongo/build/opt/install/bin/mongo --includeFilter streams --trialTime 5 --trialCount 5 --summary summary.csv`
 
 To run only manual insertion tests with 1, and 10 threads:
+
 `python benchrun.py -f testcases/streams_manual.js -t 1 10 -s ~/mongo/build/opt/install/bin/mongo --trialTime 5 --trialCount 5`
 
 For a complete list of options :  
+
 `python benchrun.py --help`
 
 For further information, see the full mongo-perf documentation at [mongodb/mongo-perf](https://github.com/mongodb/mongo-perf).
