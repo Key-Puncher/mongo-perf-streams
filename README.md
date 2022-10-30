@@ -15,9 +15,10 @@ First, activate the virtual environment then start up the mongod server from mon
 
 `./build/opt/install/bin/mongod --port 27017 --dbpath /data/db --replSet rs0 --logpath /data/log/mongod.log --bind_ip localhost --fork`
 
-Then setup the replica set as describe [here](https://wiki.corp.mongodb.com/display/~dianna.hohensee/How+to+Run+A+Performance+Workload+on+Your+Local+Machine)
+Once the server is running, connect to mongo and setup the replica set with
+`rs.initiate()`
 
-Then specify the directory containing the custom mongo shell location.
+Then specify the directory containing the custom mongo shell location and run benchrun.py.
 `python benchrun.py -f <list of testfiles> -t <list of thread configs> -s <shell path> [--trialTime <seconds>] [--trialCount <number of trials] [--summary <output file name>]`
 
 For example, to run all streaming tests with 1 thread, 5 trials each test and 5 seconds for each trial, outputting all results into a summary csv:
