@@ -24,16 +24,17 @@ sizes.forEach(size => {
         pre: function (collection) {
 
             let agg = []
+            let streamName = "ChangeStreams".concat(size.toString())
 
             agg.push({
-                $in: { db: "test0", coll: "ChangeStreams".concat(size.toString()) }
+                $in: { db: "test0", coll: streamName }
             })
 
             agg.push({
-                $merge: { into: { db: "test0", coll: "output0" } }
+                $merge: { into: { db: "test0", coll: `${streamName}-output` } }
             })
 
-            collection.getDB().createStream("ChangeStream0", agg)
+            collection.getDB().createStream("Stream".concat(size.toString()), agg)
         },
         ops: [
             {
@@ -52,9 +53,9 @@ sizes.forEach(size => {
             run("bash", "-c", command);
 
             print("@END_TEST_PRINT@")
-            collection.getDB()["ChangeStream".concat(size.toString())].drop()
-            collection.getDB()["output0"].drop()
-            collection.getDB()["ChangeStream0"].drop()
+            collection.getDB()["Stream".concat(size.toString())].drop()
+            collection.getDB()[streamName].drop()
+            collection.getDB()[`${streamName}-output`].drop()
             sleep(5000)
         }
     })
