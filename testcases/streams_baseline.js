@@ -4,6 +4,7 @@ if (typeof (tests) != "object") {
     tests = [];
 }
 
+// sizes = [100]
 sizes = [100, 10000, 100000, 1000000]
 
 run("bash", "-c", `> output-data-baseline.csv`);

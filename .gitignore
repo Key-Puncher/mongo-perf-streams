@@ -7,3 +7,5 @@ benchrun_daemon.conf
 
 node_modules
 .vscode/*
+output-data*
+summary*

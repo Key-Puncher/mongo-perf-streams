@@ -46,7 +46,7 @@ sizes.forEach(size => {
         post: function (collection, env) {
             print("@START_TEST_PRINT@")
             let streamName = "ChangeStreams".concat(size.toString())
-            let totalCount = collection.getDB()["output0"].count()
+            let totalCount = collection.getDB()[`${streamName}-output`].count()
 
             const data = `${streamName},${env.threads},${totalCount}`
             const command = `echo ${data} >> output-data-change-streams.csv`
